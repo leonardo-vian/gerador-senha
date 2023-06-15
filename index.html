@@ -1,40 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&family=Monomaniac+One&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@600&family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="reset.css"/>
     <link rel="stylesheet" href="style.css"/>
     <title>Document</title>
 </head>
 <body>
-
     <main>
         <section class="hero">
             <h1 class="title">Gerador de senha</h1>
-            <p class="subtitle">Utilize nosso gerador online para gerar sua senha de forma rápida e segura</p>            
+        <p class="subtitle">
+          Utilize o nosso gerador online para criar uma senha forte e segura.
+        </p>
         </section>
 
         <section class="box">
             <div class="password">
                 <div class="text">
-                    <input type="text" name="password" id="password">
+            <input type="text" name="password" id="password" />
                 </div>
                 <div class="actions">
                     <button id="copy-1">
-                        <img src="copy.svg" alt="42">
+              <img src="copy.svg" width="42" />
                     </button>
-                    <button id="regerar">
-                        <img src="renew.svg" alt="42">
+            <button id="renew">
+              <img src="renew.svg" width="42" />
                     </button>
                 </div>
             </div>
             <div class="security-indicator">
-                <div id="security-indicator-bar" class="bar warning" style="width: 90%"></div>
+          <div id="security-indicator-bar" class="bar"></div>
             </div>
         </section>
 
@@ -43,7 +47,15 @@
             <div class="actions">
                 <div class="password-length">
                     <p>Tamanho: <span id="password-length-text">16</span></p>
-                    <input type="range" name="password-lenght" id="password-lenght" class="slider" value="16" min="4" max="64">
+            <input
+              type="range"
+              name="password-length"
+              id="password-length"
+              class="slider"
+              value="16"
+              min="4"
+              max="64"
+            />
                 </div>
                 <div class="config">
                     <label class="checkbox-container">
@@ -63,71 +75,132 @@
                     </label>
                 </div>
             </div>
-
         </section>
         
         <div class="submit">
             <button id="copy-2">Copiar senha</button>
         </div>    
     </main>
-
     <script>
         const inputEl = document.querySelector("#password")
-        let lengthPassword = 16
+      const upperCaseCheckEl = document.querySelector("#uppercase-check")
+      const numberCheckEl = document.querySelector("#number-check")
+      const symbolCheckEl = document.querySelector("#symbol-check")
+      const securityIndicatorBarEl = document.querySelector(
+        "#security-indicator-bar"
+      )
 
-        const UpperCaseEl = document.querySelector("#uppercase-check")
-        const NumberEl = document.querySelector("#number-check")
-        const SymbolEl = document.querySelector("#symbol-check")
+      let passwordLength = 16
         
-        function geraSenha() {
+      function generatePassword() {
             let chars = "abcdefghjkmnpqrstuvwxyz"
 
-            const UppercaseChars = "ABCDEFGHJKLMNPQRSTUVWXYZ"
-            const NumberChars = "123456789"
-            const SymbolChars = "?!@&*()[]"
+        const upperCaseChars = "ABCDEFGHJKLMNPQRSTUVWXYZ"
+        const numberChars = "123456789"
+        const symbolChars = "?!@&*()[]"
 
-            if (UpperCaseEl.checked) {
-                chars += UppercaseChars
+        if (upperCaseCheckEl.checked) {
+          chars += upperCaseChars
             }
 
-            if (NumberEl.checked) {
-                chars += NumberChars
+        if (numberCheckEl.checked) {
+          chars += numberChars
             }
 
-            if (SymbolEl.checked) {
-                chars += SymbolChars
+        if (symbolCheckEl.checked) {
+          chars += symbolChars
             }
 
             let password = ""            
 
-            for (let i = 0; i < lengthPassword; i++){
-                const number = Math.floor(Math.random() * chars.length)
-                password += chars.substring(number, number + 1)
+        for (let i = 0; i < passwordLength; i++) {
+          const randomNumber = Math.floor(Math.random() * chars.length)
+          password += chars.substring(randomNumber, randomNumber + 1)
             }
             
             inputEl.value = password
+
+            calculateQuality()
+        calculateFontSize()
         }
 
-        const inputRangeEl = document.querySelector("#password-lenght")
-        inputRangeEl.addEventListener("input", function() {
-            lengthPassword = inputRangeEl.value
-            document.querySelector("#password-length-text").innerText = lengthPassword
-            geraSenha()            
-        })
+        function calculateQuality() {
+        // T*0.25 + M*0.15 + N*0.25 + S*0.35 = 100
+        const percent = Math.round(
+          (passwordLength / 64) * 25 +
+            (upperCaseCheckEl.checked ? 15 : 0) +
+            (numberCheckEl.checked ? 25 : 0) +
+            (symbolCheckEl.checked ? 35 : 0)
+        )
 
-        function copyPassword() {
-            navigator.clipboard.writeText(inputEl.value)
+            securityIndicatorBarEl.style.width = `${percent}%`
+
+        if (percent > 69) {
+          // safe
+          securityIndicatorBarEl.classList.remove("critical")
+          securityIndicatorBarEl.classList.remove("warning")
+          securityIndicatorBarEl.classList.add("safe")
+        } else if (percent > 50) {
+          // warning
+          securityIndicatorBarEl.classList.remove("critical")
+          securityIndicatorBarEl.classList.add("warning")
+          securityIndicatorBarEl.classList.remove("safe")
+        } else {
+          // critical
+          securityIndicatorBarEl.classList.add("critical")
+          securityIndicatorBarEl.classList.remove("warning")
+          securityIndicatorBarEl.classList.remove("safe")
         }
 
-        UpperCaseEl.addEventListener("click", geraSenha)
-        NumberEl.addEventListener("click", geraSenha)
-        SymbolEl.addEventListener("click", geraSenha)
+        if (percent >= 100) {
+          securityIndicatorBarEl.classList.add("completed")
+        } else {
+          securityIndicatorBarEl.classList.remove("completed")
+        }
+        }        
 
-        document.querySelector("#copy-1").addEventListener("click", copyPassword)
-        document.querySelector("#copy-2").addEventListener("click", copyPassword)
+      function calculateFontSize() {
+        if (passwordLength > 45) {
+          inputEl.classList.remove("font-sm")
+          inputEl.classList.remove("font-xs")
+          inputEl.classList.add("font-xxs")
+        } else if (passwordLength > 32) {
+          inputEl.classList.remove("font-sm")
+          inputEl.classList.add("font-xs")
+          inputEl.classList.remove("font-xxs")
+        } else if (passwordLength > 22) {
+          inputEl.classList.add("font-sm")
+          inputEl.classList.remove("font-xs")
+          inputEl.classList.remove("font-xxs")
+        } else {
+          inputEl.classList.remove("font-sm")
+          inputEl.classList.remove("font-xs")
+          inputEl.classList.remove("font-xxs")
+        }
+        }
 
-        geraSenha()
+      function copy() {
+        navigator.clipboard.writeText(inputEl.value)
+      }
+
+      const passwordLengthEl = document.querySelector("#password-length")
+      passwordLengthEl.addEventListener("input", function () {
+        passwordLength = passwordLengthEl.value
+        document.querySelector("#password-length-text").innerText =
+          passwordLength
+        generatePassword()
+      })
+      upperCaseCheckEl.addEventListener("click", generatePassword)
+      numberCheckEl.addEventListener("click", generatePassword)
+      symbolCheckEl.addEventListener("click", generatePassword)
+
+      document.querySelector("#copy-1").addEventListener("click", copy)
+      document.querySelector("#copy-2").addEventListener("click", copy)
+      document
+        .querySelector("#renew")
+        .addEventListener("click", generatePassword)
+
+      generatePassword()
     </script>
-    
 </body>
 </html>
